@@ -88,6 +88,8 @@ public class Solver {
         int[] prefixCounts = levelPrefixCounts[level];
         System.arraycopy(levelPrefixCounts[level + 1], 0, prefixCounts, 0, 10);
 
+        int reservedDigits = 0;
+
         if (maxLevelDigits == freeDigits) {
 
             if (0 == levelSum[length - 1])
@@ -95,22 +97,38 @@ public class Solver {
 
             prefixLength = Base10.updatePrefixCounts(length, prefixLength, prefixCounts, higherLevelSum, levelSum);
 
+//            for (int higherLevel = 9; higherLevel > level; --higherLevel) {
+//                if (prefixCounts[higherLevel] > digitCounts[higherLevel])
+//                    return true;
+//            }
+
+            int pendingDigitCounts = 0, underflow = 0;
             for (int higherLevel = 9; higherLevel > level; --higherLevel) {
-                if (prefixCounts[higherLevel] > digitCounts[higherLevel])
-                    return true;
+                int diff = digitCounts[higherLevel] - prefixCounts[higherLevel];
+                pendingDigitCounts += diff;
+                underflow |= diff;
             }
+
+            int availableLength = length - prefixLength;
+            int afterPrefix = availableLength - 1;
+            availableLength += (levelSum[afterPrefix] - (level + 1)) >> 31;
+
+            underflow |= availableLength - pendingDigitCounts;
+
+            if (underflow < 0)
+                return true;
+
+            reservedDigits -= (levelSum[afterPrefix] - level) >> 31;
         }
 
-        int minLevelDigits = prefixCounts[level];
-
-        int reservedDigits = 0;
         for (int lowerLevel = 0; lowerLevel < level; ++lowerLevel) {
             reservedDigits += prefixCounts[lowerLevel];
         }
 
         maxLevelDigits = Math.min(maxLevelDigits, freeDigits - reservedDigits);
 
-        if (maxLevelDigits < minLevelDigits)
+        int minLevelDigits = prefixCounts[level];
+        if (minLevelDigits > maxLevelDigits)
             return true;
 
         if (maxLevelDigits == freeDigits) {
