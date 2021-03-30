@@ -2,7 +2,7 @@ package armstrong;
 
 public class Base10 {
 
-    private static final char[] DIGIT_CHARS = new char[]{ '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
+    static final char[] DIGIT_CHARS = new char[]{ '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
 
     public static void add(int n, byte[] x, byte[] y, byte[] z) {
         int c = 0;

@@ -30,7 +30,7 @@ public class Armstrong {
 
         if (length == 1) {
             for (int digit = 0; digit <= 9; ++digit) {
-                System.out.println(digit);
+                System.out.println(Base10.DIGIT_CHARS[digit]);
             }
         }
         else if (length <= 60) {
