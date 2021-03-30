@@ -14,9 +14,9 @@ public class Solver {
             byte[][] digitTable = new byte[dimension][];
             table[digit] = digitTable;
 
-            digitTable[0] = new byte[dimension];
+            digitTable[0] = Base10.create(dimension);
 
-            byte[] first = new byte[dimension];
+            byte[] first = Base10.create(dimension);
             {
                 first[0] = digit;
                 for (int power = 1; power < length; ++power)
@@ -29,7 +29,7 @@ public class Solver {
             byte[] previous = first;
             for (int multiple = 2; multiple <= length; ++multiple)
             {
-                byte[] current = new byte[dimension];
+                byte[] current = Base10.create(dimension);
                 Base10.add(dimension, first, previous, current);
                 digitTable[multiple] = current;
                 previous = current;
@@ -53,7 +53,7 @@ public class Solver {
 
         byte[][] levelSums = new byte[11][];
         for (int i = 0; i <= 10; ++i) {
-            levelSums[i] = new byte[length + 1];
+            levelSums[i] = Base10.create(length + 1);
         }
 
         int[][] levelPrefixCounts = new int[11][];
@@ -74,13 +74,13 @@ public class Solver {
         byte[] levelSum = levelSums[level];
         byte[][] levelTable = table[level];
 
-        assert 0 == higherLevelSum[length];
+        assert 0 == Base10.getDigit(length, higherLevelSum);
 
         int maxLevelDigits = freeDigits;
 
         for (;;) {
             Base10.add(length + 1, higherLevelSum, levelTable[maxLevelDigits], levelSum);
-            if (0 == levelSum[length])
+            if (0 == Base10.getDigit(length, levelSum))
                 break;
             --maxLevelDigits;
         }
@@ -92,7 +92,7 @@ public class Solver {
 
         if (maxLevelDigits == freeDigits) {
 
-            if (0 == levelSum[length - 1])
+            if (0 == Base10.getDigit(length - 1, levelSum))
                 return false;
 
             prefixLength = Base10.updatePrefixCounts(length, prefixLength, prefixCounts, higherLevelSum, levelSum);
@@ -111,14 +111,14 @@ public class Solver {
 
             int availableLength = length - prefixLength;
             int afterPrefix = availableLength - 1;
-            availableLength += (levelSum[afterPrefix] - (level + 1)) >> 31;
+            availableLength += (Base10.getDigit(afterPrefix, levelSum) - (level + 1)) >> 31;
 
             underflow |= availableLength - pendingDigitCounts;
 
             if (underflow < 0)
                 return true;
 
-            reservedDigits -= (levelSum[afterPrefix] - level) >> 31;
+            reservedDigits -= (Base10.getDigit(afterPrefix, levelSum) - level) >> 31;
         }
 
         for (int lowerLevel = 0; lowerLevel < level; ++lowerLevel) {
@@ -144,7 +144,7 @@ public class Solver {
 
                 Base10.add(suffixLength, higherLevelSum, levelTable[levelDigits], levelSum);
 
-                if (0 == levelSum[length - 1])
+                if (0 == Base10.getDigit(length - 1, levelSum))
                     break;
 
                 digitCounts[0] = freeDigits - levelDigits;
@@ -177,7 +177,7 @@ public class Solver {
     private void checkSolution(int[] digitCounts, byte[] sum)
     {
         assert sumOfDigitCounts(digitCounts) == length;
-        assert 0 == sum[length] && 0 != sum[length - 1];
+        assert 0 == Base10.getDigit(length, sum) && 0 != Base10.getDigit(length - 1, sum);
 
         if (!Base10.exceedsAnyDigitCount(length, digitCounts, sum)) {
             Base10.printSum(length, sum);

@@ -16,6 +16,10 @@ public class Base10 {
         assert c == 0;
     }
 
+    public static byte[] create(int n) {
+        return new byte[n];
+    }
+
     public static boolean exceedsAnyDigitCount(int n, int[] digitCounts, byte[] x) {
         int[] availCounts = digitCounts.clone();
         for (int i = 0; i < n; ++i) {
@@ -23,6 +27,10 @@ public class Base10 {
                 return true;
         }
         return false;
+    }
+
+    public static byte getDigit(int pos, byte[] x) {
+        return x[pos];
     }
 
     public static void mulDigit(int n, byte[] x, byte y, byte[] z) {
